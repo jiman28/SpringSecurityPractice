@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+
+<script th:inline="javascript">
+    function toHome(frm) {
+        frm.action = /*[[@{/pokemon/home}]]*/
+            frm.submit();
+    }
+    function toKanto(frm) {
+        frm.action = /*[[@{/pokemon/kanto}]]*/
+            frm.submit();
+    }
+</script>
+
+<head>
+    <meta charset="UTF-8">
+    <title>성도 지방</title>
+</head>
+
+<body>
+    <form id="jhoto_form">
+        <h2>성도 지방 스타팅 포켓몬</h2>
+        <input type="button" value="홈으로" onclick="toHome(jhoto_form)">
+        <input type="button" value="관동 지방" onclick="toKanto(jhoto_form)">
+        <hr>
+        <table border="1"> <!-- border="1" : 테두리 사이즈를 1픽셀로 유지-->
+            <thead> <!-- 머릿말-->
+                <tr>
+                    <th>각 나라별 이름</th>
+                    <th>사진</th>
+                    <th>설명</th>
+                </tr>
+            </thead>
+
+            <tbody>
+                <tr>
+                    <td>한국: 치코리타<br>일본: チコリータ(치코리타)<br>영미: Bulbasaur</td>
+                    <td><img th:src="@{/image/jhoto/chikorita.webp}" width="150" height="200" alt="치코리타"></td>
+                    <td>70이사완료</td>
+                </tr>
+                <tr>
+                    <td>한국: 브케인<br>일본: ヒノアラシ(히노아라시)<br>영미: Cyndaquil</td>
+                    <td><img th:src="@{/image/jhoto/cyndaquil.webp}" width="150" height="200" alt="브케인"></td>
+                    <td>99이사완료</td>
+                </tr>
+                <tr>
+                    <td>한국: 리아코<br>일본: ワニノコ(와니노코)<br>영미: Totodile</td>
+                    <td><img th:src="@{/image/jhoto/totodile.webp}" width="150" height="200" alt="리아코"></td>
+                    <td>61이사완료</td>
+                </tr>
+            </tbody>
+        </table>
+    </form>
+</body>
+
+</html>

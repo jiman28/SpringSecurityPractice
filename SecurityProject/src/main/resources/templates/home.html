@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org" layout:decorate="~{layouts/layout}">
+
+<script th:inline="javascript">
+    function toKanto(frm) {
+        frm.action = /*[[@{/pokemon/kanto}]]*/
+            frm.submit();
+    }
+    function toJhoto(frm) {
+        frm.action = /*[[@{/pokemon/jhoto}]]*/
+            frm.submit();
+    }
+    function toNoticeboard(frm) {
+        frm.action = /*[[@{/pokemon/noticeboard}]]*/
+            frm.submit();
+    }
+</script>
+
+<head>
+    <meta charset="UTF-8">
+</head>
+
+<body>
+    <div layout:fragment="content">
+        <form id="home_form">
+            <div id="notloginman" sec:authorize="isAnonymous()">로그인 하면 더 많은 정보를 볼 수 있습니다</div>
+            <div id="loginman" sec:authorize="isAuthenticated()">
+                <span th:text="${member.username}"></span> 님, 환영합니다
+            </div>
+            <hr>
+            <img th:src="@{/image/home/kanto.webp}" width="400" height="500" alt="관동 지방">
+            <input type="button" value="관동 지방" onclick="toKanto(home_form)">
+
+            <img th:src="@{/image/home/jhoto.webp}" width="400" height="500" alt="성도 지방">
+            <input type="button" value="성도 지방" onclick="toJhoto(home_form)">
+        </form>
+    </div>
+</body>
+
+</html>

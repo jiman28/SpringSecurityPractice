@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <meta charset="UTF-8">
+    <!-- CSRF 토큰의 이름과 값을 HTML 메타태그에 설정 -->
+    <!-- 이를 통해 비로그인 상태에서도 해당 게시물을 볼 수가 있다 -->
+    <meta name="_csrf_header" th:content="${_csrf.headerName}">
+    <meta name="_csrf" th:content="${_csrf.token}">
+    <title>상세 조회</title>
+    <!-- 절대경로로 써줘야 항상 올바르게 js 파일을 불러올 수 있다 -->
+    <script src="/js/noticeview.js"></script>
+    <style>
+        #tr_btn_modify {
+            display: none;
+        }
+
+        #cm_btn_modify {
+            display: none;
+        }
+    </style>
+</head>
+
+<body>
+    <form name="noticeViewForm" method="post" action="" id="viewForm">
+        <!-- CSRF 토큰 추가 -->
+        <!-- CSRF 토큰을 숨겨진(input type="hidden") 필드로 폼에 추가. 이를 통해 CSRF 보호 기능이 활성화 -->
+        <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}" />
+
+        <table border="0" align="center">
+            <tbody>
+
+                <!-- 게시물 편집 -->
+                <tr>
+                    <td width="150" align="center" bgcolor="FF9933">글번호</td>
+                    <td>
+                        <input type="text" th:value="${notice.noticeNo}" id="nono" disabled>
+                        <input type="hidden" th:name="noticeNo" th:value="${notice.noticeNo}">
+                    </td>
+                </tr>
+                <tr>
+                    <td width="150" align="center" bgcolor="FF9933">작성자</td>
+                    <td>
+                        <input type="text" th:value="${notice.author.username}" th:name="notice_author" disabled>
+                    </td>
+                </tr>
+                <tr>
+                    <td width="150" align="center" bgcolor="FF9933">제목</td>
+                    <td>
+                        <input type="text" th:value="${notice.noticeTitle}" th:name="notice_title" id="n_title"
+                            disabled>
+                    </td>
+                </tr>
+                <tr>
+                    <td width="150" align="center" bgcolor="FF9933">내용</td>
+                    <td>
+                        <textarea rows="20" cols="60" align="left" th:name="notice_content" id="n_content"
+                            disabled>[[${notice.noticeContent}]]</textarea>
+                    </td>
+                </tr>
+                <tr>
+                    <td width="20%" align="center" bgcolor="FF9933">작성일</td>
+                    <td>
+                        <input type="text" th:value="${notice.noticeDate}" id="noda" disabled>
+                    </td>
+                </tr>
+
+                <tr>
+                    <td align="center">
+                        좋아요 <span th:text="${#lists.size(notice.like)}"></span>
+                    </td>
+                    <td align="center">
+                        싫어요 <span th:text="${#lists.size(notice.dislike)}"></span>
+                    </td>
+                </tr>
+
+                <tr>
+                    <td colspan="2" align="center">
+                        <input type="button" value="Like" onclick="likeThisNotice(noticeViewForm)"
+                            sec:authorize="isAuthenticated()">
+                        <input type="button" value="Dislike" onclick="dislikeThisNotice(noticeViewForm)"
+                            sec:authorize="isAuthenticated()">
+                    </td>
+                </tr>
+
+                <tr id="tr_btn" sec:authorize="isAuthenticated()"
+                    th:if="${notice.author != null and #authentication.getPrincipal().getUsername() == notice.author.username}">
+                    <td colspan="2" align="center">
+                        <input type="button" value="수정" onclick="fn_enable()">
+                        <input type="button" value="삭제" onclick="fn_remove_notice(noticeViewForm)">
+                    </td>
+                </tr>
+
+                <tr id="tr_btn_modify">
+                    <td colspan="2" align="center">
+                        <input type="button" value="저장" onclick="fn_modify_notice(noticeViewForm)">
+                        <input type="button" value="취소" onclick="toViewNotice(noticeViewForm)">
+                    </td>
+                </tr>
+
+                <tr>
+                    <td colspan="2" align="center">
+                        <input type="button" value="목록보기" onclick="toNoticeboard(noticeViewForm)">
+                        <input type="button" value="홈으로" onclick="toHome(noticeViewForm)">
+                    </td>
+                </tr>
+
+                <!-- 댓글 작성 -->
+                <tr sec:authorize="isAuthenticated()">
+                    <td width="150" align="center" bgcolor="yellow">댓글 작성</td>
+                    <td>
+                        <div>
+                            <div>
+                                <textarea rows="1" cols="60" th:name="comment_write"></textarea>
+                            </div>
+                            <div>
+                                <input type="hidden" th:name="nwcn" th:value="${notice.noticeNo}">
+                                <input type="button" value="댓글 저장" onclick="add_comment(noticeViewForm)">
+                            </div>
+                        </div>
+                    </td>
+                </tr>
+
+                <!-- 댓글이 없을 때 보기 -->
+                <tr th:if="${#strings.isEmpty(Retrieved)}" id="notHaveComment">
+                    <td colspan="2">
+                        <p align="center">
+                            <b><span style="font-size: 9pt;">등록된 댓글이 없습니다.</span></b>
+                        </p>
+                    </td>
+                </tr>
+
+                <!-- 댓글이 있을 때 보기 -->
+                <tr th:if="${!#strings.isEmpty(Retrieved)}" id="haveComment" th:each="comment:${comment_list}">
+                    <td colspan="2" align="left">
+                        <!-- 앵커태그 추가 (위치가 중요함) -->
+                        <a th:id="|comment_${comment.commentNo}|"></a>
+                        <div align="left">댓글번호: [[${comment.commentNo}]] // 작성자: [[${comment.author.username}]]</div>
+                        <div>
+                            <div id="cm_edit">
+                                <input type="text" th:value="${comment.commentContent}" th:style="${'width:500px'}"
+                                    th:name="cedit" th:id="'c'+${comment.commentNo}" disabled>
+                            </div>
+                            <div id="cm_btn" sec:authorize="isAuthenticated()"
+                                th:if="${comment.author != null and #authentication.getPrincipal().getUsername() == comment.author.username}">
+                                <input type="button" value="댓글 수정" onclick="cm_enable(this)">
+                            </div>
+                            <div id="cm_btn_modify" sec:authorize="isAuthenticated()">
+                                <input type="button" value="취소"
+                                    th:onclick="|cm_cancel_comment('@{/pokemon/cancelEditComment}', ${notice.noticeNo}, ${comment.commentNo})|">
+                                <input type="button" value="수정" th:url="@{/pokemon/editComment}"
+                                    th:nno="${notice.noticeNo}" th:cno="${comment.commentNo}"
+                                    onclick="cm_modify_comment(this.getAttribute('url'), this.parentElement.previousElementSibling.previousElementSibling.firstElementChild.value, this.getAttribute('nno'), this.getAttribute('cno'))">
+                                <input type="button" value="삭제"
+                                    th:onclick="|cm_remove_comment('@{/pokemon/removeComment}', ${notice.noticeNo}, ${comment.commentNo})|">
+                            </div>
+                        </div>
+                    </td>
+                </tr>
+
+            </tbody>
+        </table>
+    </form>
+</body>
+
+</html>

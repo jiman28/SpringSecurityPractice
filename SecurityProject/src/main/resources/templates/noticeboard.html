@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+
+<script th:inline="javascript">
+    function toHome(frm) {
+        frm.action = /*[[@{/pokemon/home}]]*/
+            frm.submit();
+    }
+    function toWriteNotice(frm) {
+        frm.action = /*[[@{/pokemon/addNotice}]]*/
+            frm.submit();
+    }
+</script>
+
+<head>
+    <meta charset="UTF-8">
+    <title>자유 게시판</title>
+</head>
+
+<body>
+    <form id="notice_form">
+        <h2>자유게시판</h2>
+        <h5>스타팅 포켓몬에 관하여 자유롭게 의견을 나누어보아요</h5>
+        <input type="button" value="홈으로" onclick="toHome(notice_form)">
+        <input type="button" value="글쓰기" onclick="toWriteNotice(notice_form)">
+
+        <hr>
+
+        <!-- 검색창 : 검색어를 입력할 수 있는 텍스트창 (JPA + raw query ) -->
+        <!-- <div class="row my-3">
+            <div class="col-6">
+                <div class="input-group">
+                    <input type="text" id="search_kw" class="form-control" th:value="${kw}">
+                    <button class="btn btn-outline-secondary" type="button" id="btn_search">찾기</button>
+                </div>
+            </div>
+        </div>
+        <hr> -->
+
+        <table border="1">
+            <thead>
+                <tr height="10" align="center">
+                    <th>글번호</th>
+                    <th>작성자</th>
+                    <th>제목</th>
+                    <th>조회수</th>
+                    <th>작성일</th>
+                </tr>
+            </thead>
+
+            <!-- 게시물이 없을 때 보기 -->
+            <tbody th:if="${#strings.isEmpty(Retrieved)}" id="notHaveNotice">
+                <tr height="10">
+                    <td colspan="5">
+                        <p align="center">
+                            <b><span style="font-size: 9pt;">등록된 게시글이 없습니다.</span></b>
+                        </p>
+                    </td>
+                </tr>
+            </tbody>
+
+            <!-- 게시물이 있을 때 보기 -->
+            <tbody th:if="${!#strings.isEmpty(Retrieved)}" id="haveNotice">
+                <!-- 페이징처리1 : spring 자체 제공 page 사용 -->
+                <!-- <tr align="center" th:each="notice:${notice_list}"> -->
+
+                <!-- 페이징처리2 : JPA pageable 사용 -->
+                <tr align="center" th:each="notice:${paging}">
+                    <td width="5%">[[${noticeStat.count}]]</td>
+                    <td width="10%">
+                        <span th:if="${notice.author != null}" th:text="${notice.author.username}"></span>
+                    </td>
+                    <td align="left" width="35%">
+                        <span style="padding-right: 30px;"></span>
+                        <a class="cls1" th:href="@{/pokemon/viewNotice/{no}(no=${notice.noticeNo})}">
+                            [[${notice.noticeTitle}]]
+                        </a>
+                        <!-- 댓글개수 표시 -->
+                        <span class="text-danger small ms-2" th:if="${#lists.size(notice.commentList) > 0}"
+                            th:text="${#lists.size(notice.commentList)}">
+                        </span>
+                    </td>
+                    <td width="5%">[[${notice.countView}]]</td>
+                    <td width="10%">[[${notice.noticeDate}]]</td>
+                </tr>
+
+            </tbody>
+
+        </table>
+        <hr>
+
+        <!-- 페이징처리1 : spring 자체 제공 page 사용 -->
+        <!-- <div class="pagination">
+            <span th:each="page : ${#numbers.sequence(0, totalPage - 1)}">
+                <a th:href="@{/pokemon/noticeboard(page=${pageStat.index})}" th:text="${pageStat.index + 1}"></a>
+            </span>
+        </div> -->
+
+        <!-- 페이징처리2 : JPA pageable 사용 -->
+        <!-- <div th:if="${!paging.isEmpty()}">
+            <ul class="pagination justify-content-center">
+                <span class="page-item" th:if="${paging.hasPrevious} ? 'disabled'">
+                    <a class="page-link" th:href="@{|?page=${paging.number-1}|}">
+                        <span>이전</span>
+                    </a>
+                </span>
+                <span th:each="page: ${#numbers.sequence(0, paging.totalPages-1)}"
+                    th:if="${page >= paging.number-5 and page <= paging.number+5}"
+                    th:classappend="${page == paging.number} ? 'active'" class="page-item">
+                    <a th:text="${page}" class="page-link" th:href="@{|?page=${page}|}"></a>
+                </span>
+                <span class="page-item" th:if="${paging.hasNext} ? 'disabled'">
+                    <a class="page-link" th:href="@{|?page=${paging.number+1}|}">
+                        <span>다음</span>
+                    </a>
+                </span>
+            </ul>
+        </div> -->
+
+        <!-- 페이징처리3 : 검색 기능 추가 -->
+        <div th:if="${!paging.isEmpty()}">
+            <ul class="pagination justify-content-center">
+                <span class="page-item" th:if="${paging.hasPrevious} ? 'disabled'">
+                    <a class="page-link" href="javascript:void(0)" th:data-page="${paging.number-1}">
+                        <span>이전</span>
+                    </a>
+                </span>
+                <span th:each="page: ${#numbers.sequence(0, paging.totalPages-1)}"
+                    th:if="${page >= paging.number-5 and page <= paging.number+5}"
+                    th:classappend="${page == paging.number} ? 'active'" class="page-item">
+                    <a th:text="${page}" class="page-link" href="javascript:void(0)" th:data-page="${page}"></a>
+                </span>
+                <span class="page-item" th:if="${paging.hasNext} ? 'disabled'">
+                    <a class="page-link" href="javascript:void(0)" th:data-page="${paging.number+1}">
+                        <span>다음</span>
+                    </a>
+                </span>
+            </ul>
+        </div>
+
+    </form>
+
+    <hr>
+
+    <!-- 검색창 : 세부검색 -->
+    <div class="row my-3">
+        <div class="col-6">
+            <div class="input-group">
+                <form th:action="@{/pokemon/noticeboard}" method="get" id="searchForm">
+                    <input type="hidden" id="kw" name="kw" th:value="${kw}">
+                    <input type="hidden" id="cs" name="cs" th:value="${cs}">
+                    <input type="hidden" id="page" name="page" th:value="${paging.number}">
+
+                    <select class="form-select form-select-sm" aria-label=".form-select-sm example" name="classification"
+                    id="classifications">
+                        <option value="all">전체</option>
+                        <option value="nAuthor">작성자</option>
+                        <option value="nTitle">제목</option>
+                        <option value="nContent">내용</option>
+                    </select>
+
+                    <input type="text" id="search_kw" class="form-control" th:value="${kw}">
+                    <button class="btn btn-outline-secondary" type="button" id="btn_search">검색</button>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- 검색 스크립트 : page, kw 파라미터를 동시에 요청 -->
+    <script layout:fragment="script" type='text/javascript'>
+        let page_elements = document.getElementsByClassName("page-link");
+        Array.from(page_elements).forEach(function (element) {
+            element.addEventListener('click', function () {
+                document.getElementById('page').value = this.dataset.page;
+                document.getElementById('searchForm').submit();
+            });
+        });
+        let btn_search = document.getElementById("btn_search");
+        btn_search.addEventListener('click', function () {
+            document.getElementById('kw').value = document.getElementById('search_kw').value;
+            document.getElementById('cs').value = document.getElementsByName('classification')[0].value;
+            document.getElementById('page').value = 0;  // 검색버튼을 클릭할 경우 0페이지부터 조회한다.
+            document.getElementById('searchForm').submit();
+        });
+    </script>
+
+</body>
+
+</html>

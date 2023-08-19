@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+
+<script th:inline="javascript">
+    function toHome(frm) {
+        frm.action = /*[[@{/pokemon/home}]]*/
+            frm.submit();
+    }
+    function toJhoto(frm) {
+        frm.action = /*[[@{/pokemon/jhoto}]]*/
+            frm.submit();
+    }
+</script>
+
+<head>
+    <meta charset="UTF-8">
+    <title>관동 지방</title>
+</head>
+
+<body>
+    <form id="kanto_form">
+        <h2>관동 지방 스타팅 포켓몬</h2>
+        <input type="button" value="홈으로" onclick="toHome(kanto_form)">
+        <input type="button" value="성도 지방" onclick="toJhoto(kanto_form)">
+        <hr>
+        <table border="1"> <!-- border="1" : 테두리 사이즈를 1픽셀로 유지-->
+            <thead> <!-- 머릿말-->
+                <tr>
+                    <th>각 나라별 이름</th>
+                    <th>사진</th>
+                    <th>설명</th>
+                </tr>
+            </thead>
+
+            <tbody>
+                <tr>
+                    <td>한국: 이상해씨<br>일본: フシギダネ(후시기다네)<br>영미: Bulbasaur</td>
+                    <td><img th:src="@{/image/kanto/bulbasaur.webp}" width="150" height="200" alt="이상해씨"></td>
+                    <td>70이사완료</td>
+                </tr>
+                <tr>
+                    <td>한국: 파이리<br>일본: ヒトカゲ(히토카게)<br>영미: Charmander</td>
+                    <td><img th:src="@{/image/kanto/charmander.webp}" width="150" height="200" alt="파이리"></td>
+                    <td>99이사완료</td>
+                </tr>
+                <tr>
+                    <td>한국: 꼬부기<br>일본: ゼニガメ(제니가메)<br>영미: Squirtle</td>
+                    <td><img th:src="@{/image/kanto/squirtle.webp}" width="150" height="200" alt="꼬부기"></td>
+                    <td>61이사완료</td>
+                </tr>
+                <tr>
+                    <td>한국: 피카츄<br>일본: ピカチュウ(피카츄)<br>영미: Pikachu</td>
+                    <td><img th:src="@{/image/kanto/pikachu.webp}" width="150" height="200" alt="피카츄"></td>
+                    <td>61이사완료</td>
+                </tr>
+                <tr>
+                    <td>한국: 이브이<br>일본: イーブイ(이브이)<br>영미: Eevee</td>
+                    <td><img th:src="@{/image/kanto/eevee.webp}" width="150" height="200" alt="이브이"></td>
+                    <td>61이사완료</td>
+                </tr>
+            </tbody>
+        </table>
+    </form>
+</body>
+
+</html>

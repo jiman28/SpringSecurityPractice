@@ -1,0 +1,28 @@
+<html layout:decorate="~{layouts/layout}">
+
+<div layout:fragment="content" class="container my-3">
+    <div class="my-3 border-bottom">
+        <div>
+            <h4>게시물 작성하기</h4>
+        </div>
+    </div>
+
+    <form th:action="@{/pokemon/addNotice}" th:object="${noticeWriteForm}" method="post">
+        <div th:replace="~{form_errors :: formErrorsFragment}"></div>
+
+        <div class="mb-3">
+            <label for="writeTitle" class="form-label">글제목</label>
+            <input type="text" th:field="*{writeTitle}" class="form-control">
+        </div>
+
+        <div class="mb-3">
+            <label for="writeContent" class="form-label">글내용</label>
+            <textarea th:field="*{writeContent}" rows="20" cols="60" maxlength="5000" class="form-control"></textarea>
+        </div>
+
+        <button type="submit" class="btn btn-outline-primary" >게시글 저장</button>
+    </form>
+
+</div>
+
+</html>
